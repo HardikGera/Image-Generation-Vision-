@@ -24,7 +24,7 @@ export default function HeroSection() {
     try {
       console.log('Sending request to generate images with prompt:', prompt);
       
-      const response = await fetch('/api/gemini/generate-image', {
+      const response = await fetch('/api/stability/generate-image', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
