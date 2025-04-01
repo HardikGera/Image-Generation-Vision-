@@ -12,7 +12,7 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log('Generating images for prompt using Stability AI:', prompt);
+    console.log('Generating image for prompt using Stability AI:', prompt);
 
     const apiKey = process.env.STABILITY_API_KEY;
     if (!apiKey) {
@@ -38,25 +38,49 @@ export async function POST(request: Request) {
           cfg_scale: 7,
           height: 1024,
           width: 1024,
-          samples: 4,
+          samples: 1,
           steps: 30,
         }),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({ message: 'Failed to parse error response' }));
+        console.error('Stability API error response:', errorData);
         throw new Error(`Stability API error: ${JSON.stringify(errorData)}`);
       }
 
       const data = await response.json();
+      console.log('Stability API response keys:', Object.keys(data));
       
-      // Map the response to our expected format
-      const generatedImages = data.artifacts.map((image: any) => ({
-        url: image.base64,
-        mimeType: 'image/png'
-      }));
+      if (!data.artifacts || !Array.isArray(data.artifacts) || data.artifacts.length === 0) {
+        throw new Error('No artifacts received from Stability API');
+      }
+      
+      // Debug the first artifact to understand its structure
+      const firstArtifact = data.artifacts[0];
+      console.log('Artifact keys:', Object.keys(firstArtifact));
+      
+      // Process the images
+      const generatedImages = data.artifacts.map((artifact: any, index: number) => {
+        // The Stability API returns base64 data in the 'base64' field
+        if (!artifact.base64) {
+          console.error(`Missing base64 data for image ${index}`);
+          return null;
+        }
+        
+        console.log(`Image ${index} has base64 data of length:`, artifact.base64.length);
+        
+        return {
+          url: artifact.base64,
+          mimeType: 'image/png' // Stability always returns PNGs
+        };
+      }).filter(Boolean);  // Remove any null entries
+      
+      if (generatedImages.length === 0) {
+        throw new Error('Failed to process image data from Stability API');
+      }
 
-      console.log('Images generated successfully:', generatedImages.length);
+      console.log('Images processed successfully:', generatedImages.length);
 
       return NextResponse.json({
         images: generatedImages

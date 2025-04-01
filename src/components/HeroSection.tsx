@@ -1,15 +1,15 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sparkles } from 'lucide-react';
-import Image from 'next/image';
 
 export default function HeroSection() {
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [generatedImages, setGeneratedImages] = useState<Array<{ url: string, mimeType: string }>>([]);
+  const [debugMode, setDebugMode] = useState(false); // Turn debug mode off by default
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -22,7 +22,7 @@ export default function HeroSection() {
     setGeneratedImages([]);
     
     try {
-      console.log('Sending request to generate images with prompt:', prompt);
+      console.log('Sending request to generate image with prompt:', prompt);
       
       const response = await fetch('/api/stability/generate-image', {
         method: 'POST',
@@ -32,25 +32,48 @@ export default function HeroSection() {
         body: JSON.stringify({ prompt }),
       });
       
-      const data = await response.json();
-      
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to generate images');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate image');
       }
       
-      console.log('Received images:', data.images);
+      const data = await response.json();
+      console.log('Response received:', data);
       
       if (!data.images || data.images.length === 0) {
-        throw new Error('No images were generated');
+        throw new Error('No image was generated');
+      }
+      
+      // Debug log to see the structure of the image
+      if (data.images[0]) {
+        console.log('Image data:', {
+          hasUrl: !!data.images[0].url,
+          urlLength: data.images[0].url?.length || 0,
+          urlPreview: data.images[0].url ? data.images[0].url.substring(0, 30) + '...' : 'No data',
+          mimeType: data.images[0].mimeType
+        });
       }
       
       setGeneratedImages(data.images);
     } catch (err: any) {
       setError(err.message || 'An error occurred');
-      console.error('Error generating images:', err);
+      console.error('Error generating image:', err);
     } finally {
       setLoading(false);
     }
+  };
+
+  // This effect will log when images are added to state
+  useEffect(() => {
+    if (generatedImages.length > 0) {
+      console.log(`${generatedImages.length} image set in state successfully`);
+      console.log('First image data (preview):', 
+        generatedImages[0]?.url ? generatedImages[0].url.substring(0, 30) + '...' : 'No data');
+    }
+  }, [generatedImages]);
+
+  const toggleDebugMode = () => {
+    setDebugMode(!debugMode);
   };
 
   return (
@@ -126,28 +149,71 @@ export default function HeroSection() {
             <span>🎨 Multiple Styles</span>
             <span>•</span>
             <span>⚡ Lightning Fast</span>
+            <span onClick={toggleDebugMode} className="cursor-pointer ml-4 text-xs opacity-50 hover:opacity-100">
+              •Debug: {debugMode ? 'ON' : 'OFF'}
+            </span>
           </motion.div>
         </motion.div>
       </div>
 
       {generatedImages.length > 0 && (
         <div className="relative z-10 mt-16 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold mb-8 text-center">Generated Images</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <h2 className="text-3xl font-bold mb-8 text-center">Generated Image</h2>
+          <div className="grid grid-cols-1 gap-6">
             {generatedImages.map((image, index) => (
               <motion.div 
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="relative aspect-square overflow-hidden rounded-lg border border-purple-500/30 shadow-xl shadow-purple-500/10"
+                className="relative aspect-square overflow-hidden rounded-lg border border-purple-500/30 shadow-xl shadow-purple-500/10 mx-auto"
+                style={{ maxWidth: '512px' }}
               >
-                <Image
+                {/* Data info for debugging */}
+                {debugMode && (
+                  <div className="absolute inset-0 flex items-center justify-center text-xs text-gray-400 p-2 text-center bg-black/80 z-20">
+                    <div>
+                      <p>Image Data</p>
+                      <p>Data length: {typeof image.url === 'string' ? image.url.length : 'N/A'}</p>
+                      <p>MIME: {image.mimeType}</p>
+                      <p>Preview: {image.url ? image.url.substring(0, 20) + '...' : 'No data'}</p>
+                      <button 
+                        className="mt-2 px-2 py-1 bg-gray-800 text-gray-300 rounded text-xs hover:bg-gray-700"
+                        onClick={() => toggleDebugMode()}
+                      >
+                        Hide Debug
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Standard HTML img tag for base64 data */}
+                <img
                   src={`data:${image.mimeType};base64,${image.url}`}
                   alt={`Generated image ${index + 1}`}
-                  fill
-                  className="object-cover"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.error(`Error loading image ${index}:`, e);
+                    const target = e.currentTarget as HTMLImageElement;
+                    target.style.display = 'none';
+                    
+                    // Add an error message
+                    const container = target.parentElement;
+                    if (container) {
+                      const errorMsg = document.createElement('div');
+                      errorMsg.className = 'absolute inset-0 flex items-center justify-center text-red-400 bg-black/80';
+                      errorMsg.innerHTML = 'Error loading image.<br>Check console for details.';
+                      container.appendChild(errorMsg);
+                    }
+                  }}
                 />
+                
+                {/* Show data length for debugging purposes */}
+                {image.url && !debugMode && (
+                  <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1 text-center">
+                    Received data: {image.url.length} characters
+                  </div>
+                )}
               </motion.div>
             ))}
           </div>
