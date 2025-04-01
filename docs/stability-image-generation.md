@@ -59,12 +59,12 @@ export async function POST(request: Request) {
           cfg_scale: 7,
           height: 1024,
           width: 1024,
-          samples: 4,
+          samples: 1, // Generate 1 image to save credits
           steps: 30,
         }),
       });
 
-      // Process response and return images
+      // Process response and return image
       // ...
     } catch (modelError) {
       // Error handling
@@ -89,8 +89,13 @@ The client component for image generation is implemented in `src/components/Hero
 * `cfg_scale`: How strictly the diffusion process adheres to the prompt text (higher values keep your image closer to your prompt).
 * `height`: The height of the generated image.
 * `width`: The width of the generated image.
-* `samples`: The number of images to generate.
+* `samples`: The number of images to generate. We use 1 to conserve credits.
 * `steps`: The number of diffusion steps to run.
+
+### Credit Usage
+
+* Each image generation request with `samples: 1` uses 1 credit
+* To conserve your free credits (which are limited), we generate one image at a time
 
 ### Available Models
 

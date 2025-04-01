@@ -8,7 +8,7 @@ Vision is a modern web application that leverages Stability AI (DreamStudio) to 
 
 - **AI-Powered Image Generation**: Generate high-quality images from text descriptions using Stability AI's SDXL model
 - **Responsive UI**: Beautiful user interface that works across devices
-- **Multiple Image Results**: Generates 4 unique images per prompt
+- **Credit-Conscious Design**: Generates one image per prompt to conserve API credits
 - **Modern Design**: Created with Tailwind CSS and Framer Motion for smooth animations
 
 ## Tech Stack
@@ -59,8 +59,12 @@ Vision is a modern web application that leverages Stability AI (DreamStudio) to 
 
 1. Enter a descriptive prompt in the text field (e.g., "a person on moon with a dog")
 2. Click the "Generate" button
-3. Wait for the AI to generate four unique images based on your prompt
-4. Browse through the generated images
+3. Wait for the AI to generate a high-quality image based on your prompt
+4. To generate a different image, simply enter a new prompt and click Generate again
+
+## Credit Usage
+
+Each image generation costs 1 credit in the Stability AI API. The application is designed to generate one image at a time to help conserve your free credits.
 
 ## Screenshots
 
