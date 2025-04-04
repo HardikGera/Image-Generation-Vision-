@@ -53,7 +53,7 @@ export function ApiKeySetupGuide() {
       
       <div className="mt-8 p-4 bg-blue-900/20 border border-blue-800 rounded-lg">
         <p className="text-blue-300">
-          <strong>Note:</strong> Stability AI provides limited free credits for new accounts. After using the free credits, you'll need to purchase additional credits to continue using the API.
+          <strong>Note:</strong> Stability AI provides limited free credits for new accounts. After using the free credits, you&apos;ll need to purchase additional credits to continue using the API.
         </p>
       </div>
     </div>
