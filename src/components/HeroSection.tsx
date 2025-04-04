@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Download, Copy, Check } from 'lucide-react';
 
 export default function HeroSection() {
   const [prompt, setPrompt] = useState('');
@@ -10,6 +10,8 @@ export default function HeroSection() {
   const [error, setError] = useState('');
   const [generatedImages, setGeneratedImages] = useState<Array<{ url: string, mimeType: string }>>([]);
   const [debugMode, setDebugMode] = useState(false); // Turn debug mode off by default
+  const [copySuccess, setCopySuccess] = useState(false); // Track copy success state
+  const [lastCopiedIndex, setLastCopiedIndex] = useState<number | null>(null); // Track which image was copied
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -74,6 +76,39 @@ export default function HeroSection() {
 
   const toggleDebugMode = () => {
     setDebugMode(!debugMode);
+  };
+
+  // Function to handle image download
+  const handleDownload = (imageData: string, mimeType: string) => {
+    const link = document.createElement('a');
+    link.href = `data:${mimeType};base64,${imageData}`;
+    link.download = `ai-generated-image-${Date.now()}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Function to handle image copy to clipboard
+  const handleCopy = async (imageData: string, mimeType: string, index: number) => {
+    try {
+      const response = await fetch(`data:${mimeType};base64,${imageData}`);
+      const blob = await response.blob();
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          [blob.type]: blob
+        })
+      ]);
+      
+      setCopySuccess(true);
+      setLastCopiedIndex(index);
+      setTimeout(() => {
+        setCopySuccess(false);
+        setLastCopiedIndex(null);
+      }, 2000);
+    } catch (err) {
+      console.error('Failed to copy image: ', err);
+      setError('Failed to copy image to clipboard');
+    }
   };
 
   return (
@@ -208,9 +243,39 @@ export default function HeroSection() {
                   }}
                 />
                 
+                {/* Add download and copy buttons container */}
+                <div className="absolute bottom-0 left-0 right-0 p-3 bg-black/70 flex justify-center space-x-4">
+                  <button
+                    onClick={() => handleDownload(image.url, image.mimeType)}
+                    className="bg-white text-black rounded-md px-4 py-2 text-sm font-medium flex items-center hover:bg-gray-200 transition-colors shadow-md"
+                    style={{ minWidth: '120px', justifyContent: 'center' }}
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download
+                  </button>
+                  
+                  <button
+                    onClick={() => handleCopy(image.url, image.mimeType, index)}
+                    className="bg-white text-black rounded-md px-4 py-2 text-sm font-medium flex items-center hover:bg-gray-200 transition-colors shadow-md"
+                    style={{ minWidth: '120px', justifyContent: 'center' }}
+                  >
+                    {copySuccess && lastCopiedIndex === index ? (
+                      <>
+                        <Check className="w-4 h-4 mr-2 text-green-600" />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4 mr-2" />
+                        Copy
+                      </>
+                    )}
+                  </button>
+                </div>
+                
                 {/* Show data length for debugging purposes */}
-                {image.url && !debugMode && (
-                  <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1 text-center">
+                {image.url && debugMode && (
+                  <div className="absolute bottom-16 left-0 right-0 bg-black/70 text-white text-xs p-1 text-center">
                     Received data: {image.url.length} characters
                   </div>
                 )}
