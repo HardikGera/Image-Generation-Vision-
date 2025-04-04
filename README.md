@@ -55,12 +55,37 @@ Vision is a modern web application that leverages Stability AI (DreamStudio) to 
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
-## Usage
+## Deployment on Vercel
 
-1. Enter a descriptive prompt in the text field (e.g., "a person on moon with a dog")
-2. Click the "Generate" button
-3. Wait for the AI to generate a high-quality image based on your prompt
-4. To generate a different image, simply enter a new prompt and click Generate again
+### Setting Up Environment Variables on Vercel
+
+When deploying to Vercel, you need to configure your environment variables in the Vercel dashboard:
+
+1. Create a new project on Vercel and import your repository
+2. In the project settings, go to the "Environment Variables" section
+3. Add the following environment variable:
+   - Key: `STABILITY_API_KEY`
+   - Value: Your Stability AI API key from DreamStudio
+4. Deploy your application
+
+![Vercel Environment Variables](vercel-env-vars.png)
+
+### Vercel One-Click Deployment
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FHardikGera%2FImage-Generation-Vision-&env=STABILITY_API_KEY&envDescription=API%20key%20for%20Stability%20AI%20required%20to%20generate%20images&envLink=https%3A%2F%2Fbeta.dreamstudio.ai%2Fmembership%3Ftab%3DapiKeys)
+
+## Troubleshooting
+
+### Common Errors
+
+**"Stability API key is not set"**
+- Make sure you've added the STABILITY_API_KEY to your `.env.local` file for local development
+- For Vercel deployment, check if the environment variable is properly configured in your project settings
+
+**"Failed to generate image"**
+- Check if your Stability AI account has enough credits
+- Verify your API key is correct and not expired
+- Check the browser console for more detailed error messages
 
 ## Credit Usage
 

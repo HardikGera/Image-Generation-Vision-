@@ -16,7 +16,13 @@ export async function POST(request: Request) {
 
     const apiKey = process.env.STABILITY_API_KEY;
     if (!apiKey) {
-      throw new Error('Stability API key is not set');
+      return NextResponse.json(
+        { 
+          error: 'Stability API key is not set', 
+          message: 'Please set the STABILITY_API_KEY environment variable in your .env.local file or Vercel project settings.'
+        },
+        { status: 401 }
+      );
     }
 
     try {

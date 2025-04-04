@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { Sparkles, Download, Copy, Check } from 'lucide-react';
+import ApiKeyMissingAlert from './ApiKeyMissingAlert';
 
 export default function HeroSection() {
   const [prompt, setPrompt] = useState('');
@@ -167,11 +168,18 @@ export default function HeroSection() {
             </div>
           </motion.div>
 
-          {error && (
-            <div className="mt-6 p-4 bg-red-900/30 border border-red-800 rounded-lg text-center text-red-200">
-              {error}
+          {error && error.includes('Stability API key is not set') ? (
+            <ApiKeyMissingAlert 
+              serviceName="Stability AI" 
+              envVarName="STABILITY_API_KEY" 
+              docsLink="https://platform.stability.ai/docs/api-reference"
+            />
+          ) : error ? (
+            <div className="mt-6 p-4 bg-red-900/30 border border-red-800 rounded-lg text-center">
+              <h3 className="text-xl font-semibold text-red-200 mb-2">Error</h3>
+              <p className="text-red-200">{error}</p>
             </div>
-          )}
+          ) : null}
 
           <motion.div
             initial={{ opacity: 0 }}

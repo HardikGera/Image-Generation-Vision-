@@ -11,3 +11,14 @@ export default function RootLayout({
     </html>
   );
 }
+
+export const metadata = {
+  title: 'Vision - AI Image Generator',
+  description: 'Generate stunning AI images from text prompts using Stability AI',
+  keywords: 'AI, image generation, Stability AI, SDXL, text-to-image',
+  openGraph: {
+    title: 'Vision - AI Image Generator',
+    description: 'Generate stunning AI images from text prompts using Stability AI',
+    images: ['/og-image.png'],
+  },
+};
