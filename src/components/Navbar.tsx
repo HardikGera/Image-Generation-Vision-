@@ -4,9 +4,16 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/lib/hooks/useAuth';
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    // The page will refresh automatically due to the auth state change
+  };
 
   return (
     <motion.nav 
@@ -49,21 +56,37 @@ export default function Navbar() {
           </div>
           <div className="hidden sm:ml-6 sm:flex sm:items-center">
             <div className="flex space-x-4">
-              <Link href="#" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                Sign in
-              </Link>
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Link 
-                  href="#" 
-                  className="relative group bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-md text-sm font-medium overflow-hidden"
-                >
-                  <span className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                  <span className="relative z-10">Get Started</span>
-                </Link>
-              </motion.div>
+              {user ? (
+                <>
+                  <Link href="/profile" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                    Profile
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Sign out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link href="/login" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                    Sign in
+                  </Link>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Link 
+                      href="/signup" 
+                      className="relative group bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-md text-sm font-medium overflow-hidden"
+                    >
+                      <span className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                      <span className="relative z-10">Get Started</span>
+                    </Link>
+                  </motion.div>
+                </>
+              )}
             </div>
           </div>
           <div className="-mr-2 flex items-center sm:hidden">
@@ -113,20 +136,43 @@ export default function Navbar() {
             >
               Resources
             </Link>
-            <Link 
-              href="#" 
-              className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium border-l-2 border-transparent hover:border-purple-500 hover:bg-gray-900 transition-all duration-300"
-              onClick={() => setMenuOpen(false)}
-            >
-              Sign in
-            </Link>
-            <Link 
-              href="#" 
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white block px-3 py-2 rounded-md text-base font-medium"
-              onClick={() => setMenuOpen(false)}
-            >
-              Get Started
-            </Link>
+            {user ? (
+              <>
+                <Link 
+                  href="/profile" 
+                  className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium border-l-2 border-transparent hover:border-purple-500 hover:bg-gray-900 transition-all duration-300"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Profile
+                </Link>
+                <button
+                  onClick={() => {
+                    handleSignOut();
+                    setMenuOpen(false);
+                  }}
+                  className="text-gray-300 hover:text-white block w-full text-left px-3 py-2 rounded-md text-base font-medium border-l-2 border-transparent hover:border-purple-500 hover:bg-gray-900 transition-all duration-300"
+                >
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link 
+                  href="/login" 
+                  className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium border-l-2 border-transparent hover:border-purple-500 hover:bg-gray-900 transition-all duration-300"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Sign in
+                </Link>
+                <Link 
+                  href="/signup" 
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white block px-3 py-2 rounded-md text-base font-medium"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Get Started
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}

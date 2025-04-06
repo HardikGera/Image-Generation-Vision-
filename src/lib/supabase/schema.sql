@@ -54,10 +54,13 @@ CREATE TABLE IF NOT EXISTS public.likes (
 -- PROFILES policies
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies first to avoid conflicts
+DROP POLICY IF EXISTS "Public profiles are viewable by everyone" ON public.profiles;
 CREATE POLICY "Public profiles are viewable by everyone"
   ON public.profiles FOR SELECT
   USING (true);
 
+DROP POLICY IF EXISTS "Users can update their own profile" ON public.profiles;
 CREATE POLICY "Users can update their own profile"
   ON public.profiles FOR UPDATE
   USING (auth.uid() = id);
@@ -65,18 +68,22 @@ CREATE POLICY "Users can update their own profile"
 -- IMAGES policies
 ALTER TABLE public.images ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Images are viewable by everyone" ON public.images;
 CREATE POLICY "Images are viewable by everyone"
   ON public.images FOR SELECT
   USING (true);
 
+DROP POLICY IF EXISTS "Users can insert their own images" ON public.images;
 CREATE POLICY "Users can insert their own images"
   ON public.images FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own images" ON public.images;
 CREATE POLICY "Users can update their own images"
   ON public.images FOR UPDATE
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete their own images" ON public.images;
 CREATE POLICY "Users can delete their own images"
   ON public.images FOR DELETE
   USING (auth.uid() = user_id);
@@ -84,14 +91,17 @@ CREATE POLICY "Users can delete their own images"
 -- LIKES policies
 ALTER TABLE public.likes ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Likes are viewable by everyone" ON public.likes;
 CREATE POLICY "Likes are viewable by everyone"
   ON public.likes FOR SELECT
   USING (true);
 
+DROP POLICY IF EXISTS "Users can insert their own likes" ON public.likes;
 CREATE POLICY "Users can insert their own likes"
   ON public.likes FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete their own likes" ON public.likes;
 CREATE POLICY "Users can delete their own likes"
   ON public.likes FOR DELETE
   USING (auth.uid() = user_id); 

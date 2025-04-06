@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { Sparkles, Download, Copy, Check } from 'lucide-react';
 import ApiKeyMissingAlert from './ApiKeyMissingAlert';
+import Link from 'next/link';
+import { useAuth } from '@/lib/hooks/useAuth';
 
 export default function HeroSection() {
   const [prompt, setPrompt] = useState('');
@@ -13,6 +15,7 @@ export default function HeroSection() {
   const [debugMode, setDebugMode] = useState(false); // Turn debug mode off by default
   const [copySuccess, setCopySuccess] = useState(false); // Track copy success state
   const [lastCopiedIndex, setLastCopiedIndex] = useState<number | null>(null); // Track which image was copied
+  const { user } = useAuth();
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -32,7 +35,10 @@ export default function HeroSection() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({ 
+          prompt,
+          userId: user?.id // Include user ID if available
+        }),
       });
       
       if (!response.ok) {
@@ -249,42 +255,54 @@ export default function HeroSection() {
                     const container = target.parentElement;
                     if (container) {
                       const errorMsg = document.createElement('div');
-                      errorMsg.className = 'absolute inset-0 flex items-center justify-center text-red-400 bg-black/80';
-                      errorMsg.innerHTML = 'Error loading image.<br>Check console for details.';
+                      errorMsg.className = 'absolute inset-0 flex items-center justify-center text-red-400 bg-gray-900/90';
+                      errorMsg.textContent = 'Failed to load image';
                       container.appendChild(errorMsg);
                     }
                   }}
                 />
                 
-                {/* Action buttons (download, copy) */}
-                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex justify-center space-x-2">
+                {/* Image actions (download, copy) */}
+                <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex justify-center gap-2">
                   <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
                     onClick={() => handleDownload(image.url, image.mimeType)}
-                    className="p-2 bg-blue-600 rounded-full text-white hover:bg-blue-500"
-                    title="Download image"
-                  >
-                    <Download className="h-5 w-5" />
-                  </motion.button>
-                  
-                  <motion.button
+                    className="p-2 bg-black/50 rounded-full backdrop-blur-sm hover:bg-purple-600/80 transition-colors duration-300"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
-                    onClick={() => handleCopy(image.url, image.mimeType, index)}
-                    className="p-2 bg-purple-600 rounded-full text-white hover:bg-purple-500"
-                    title="Copy to clipboard"
                   >
-                    {lastCopiedIndex === index && copySuccess ? (
-                      <Check className="h-5 w-5" />
+                    <Download className="w-5 h-5 text-white" />
+                  </motion.button>
+                  <motion.button
+                    onClick={() => handleCopy(image.url, image.mimeType, index)}
+                    className="p-2 bg-black/50 rounded-full backdrop-blur-sm hover:bg-purple-600/80 transition-colors duration-300"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    {copySuccess && lastCopiedIndex === index ? (
+                      <Check className="w-5 h-5 text-green-400" />
                     ) : (
-                      <Copy className="h-5 w-5" />
+                      <Copy className="w-5 h-5 text-white" />
                     )}
                   </motion.button>
                 </div>
               </motion.div>
             ))}
           </div>
+          
+          {!user && (
+            <div className="mt-12 text-center">
+              <p className="text-gray-400 mb-4">Create an account to save your generated images!</p>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-block"
+              >
+                <Link href="/signup" className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg shadow-lg hover:shadow-purple-500/30 transition duration-300">
+                  Sign Up - It's Free
+                </Link>
+              </motion.div>
+            </div>
+          )}
         </div>
       )}
     </section>
