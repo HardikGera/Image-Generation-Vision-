@@ -9,15 +9,17 @@ export default function Home() {
   const hasStabilityKey = !!process.env.STABILITY_API_KEY;
 
   return (
-    <main className="min-h-screen bg-[#111111] text-white">
+    <div className="min-h-screen bg-[#111111] text-white relative overflow-hidden">
       <Navbar />
-      <HeroSection />
-      {!hasStabilityKey && (
-        <div className="container mx-auto px-4 py-12">
-          <ApiKeySetupGuide />
-        </div>
-      )}
-      <ArtGallery />
-    </main>
+      <div className="pt-16">
+        <HeroSection />
+        {!hasStabilityKey && (
+          <div className="container mx-auto px-4 py-12">
+            <ApiKeySetupGuide />
+          </div>
+        )}
+        <ArtGallery />
+      </div>
+    </div>
   );
 }

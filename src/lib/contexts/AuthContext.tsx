@@ -1,59 +1,105 @@
 "use client";
 
-import React, { createContext, useEffect, useState } from "react";
-import { signInWithPopup, GoogleAuthProvider, signOut as firebaseSignOut } from "firebase/auth";
-import { User } from "firebase/auth";
-import { auth } from "../firebase/firebase";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { createClient } from '@/lib/supabase/client';
+import { Session, User } from '@supabase/supabase-js';
 
-interface AuthContextType {
+type AuthContextType = {
   user: User | null;
-  loading: boolean;
-  signInWithGoogle: () => Promise<void>;
+  session: Session | null;
+  isLoading: boolean;
+  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
-}
+  signInWithGoogle: () => Promise<void>;
+};
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  loading: true,
-  signInWithGoogle: async () => {},
-  signOut: async () => {},
-});
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [session, setSession] = useState<Session | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const supabase = createClient();
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUser(user);
-      setLoading(false);
-    });
+    // Set up the auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setIsLoading(false);
+      }
+    );
 
-    return () => unsubscribe();
+    // Get the initial session
+    const initializeAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session);
+      setUser(session?.user ?? null);
+      setIsLoading(false);
+    };
+
+    initializeAuth();
+
+    // Clean up the subscription
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
+  // Sign in with email and password
+  const signIn = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    return { error };
+  };
+
+  // Sign up with email and password
+  const signUp = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    return { error };
+  };
+
+  // Sign out
+  const signOut = async () => {
+    await supabase.auth.signOut();
+  };
+
+  // Sign in with Google
   const signInWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error("Error signing in with Google", error);
-    }
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
   };
 
-  const signOutUser = async () => {
-    try {
-      await firebaseSignOut(auth);
-    } catch (error) {
-      console.error("Error signing out", error);
-    }
+  const value = {
+    user,
+    session,
+    isLoading,
+    signIn,
+    signUp,
+    signOut,
+    signInWithGoogle,
   };
 
-  return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signOut: signOutUser }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export { AuthContext };
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

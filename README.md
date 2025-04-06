@@ -1,12 +1,14 @@
-# Vision - AI Image Generator
+# Vision - AI Image Generator with Authentication
 
-Vision is a modern web application that leverages Stability AI (DreamStudio) to generate high-quality images from text prompts. Built with Next.js, React, and Tailwind CSS, this project showcases the power of AI in creating visual content.
+Vision is a modern web application that leverages Stability AI (DreamStudio) to generate high-quality images from text prompts. Built with Next.js, React, and Tailwind CSS, this project showcases the power of AI in creating visual content and includes user authentication powered by Supabase.
 
 ![Vision AI Image Generator](screenshot.png)
 
 ## Features
 
 - **AI-Powered Image Generation**: Generate high-quality images from text descriptions using Stability AI's SDXL model
+- **User Authentication**: Secure login and signup functionality with Supabase
+- **User Profiles**: Personalized user profiles
 - **Responsive UI**: Beautiful user interface that works across devices
 - **Credit-Conscious Design**: Generates one image per prompt to conserve API credits
 - **Modern Design**: Created with Tailwind CSS and Framer Motion for smooth animations
@@ -15,6 +17,7 @@ Vision is a modern web application that leverages Stability AI (DreamStudio) to 
 
 - **Frontend**: React, Next.js, Tailwind CSS, Framer Motion
 - **API**: Stability AI (DreamStudio) API
+- **Authentication & Database**: Supabase
 - **Styling**: Tailwind CSS
 - **Deployment**: Vercel (recommended)
 
@@ -25,13 +28,14 @@ Vision is a modern web application that leverages Stability AI (DreamStudio) to 
 - Node.js 18.x or higher
 - npm or yarn
 - A Stability AI API key (obtain from [DreamStudio](https://beta.dreamstudio.ai/membership?tab=apiKeys))
+- A Supabase project (create at [Supabase](https://supabase.com/))
 
 ### Installation
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/HardikGera/Image-Generation-Vision-.git
-   cd Image-Generation-Vision-
+   git clone https://github.com/yourusername/vision-ai-image-generator.git
+   cd vision-ai-image-generator
    ```
 
 2. Install dependencies:
@@ -41,9 +45,11 @@ Vision is a modern web application that leverages Stability AI (DreamStudio) to 
    yarn install
    ```
 
-3. Create a `.env.local` file in the root directory and add your Stability AI API key:
+3. Create a `.env.local` file in the root directory and add your API keys:
    ```
    STABILITY_API_KEY=your_stability_api_key_here
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
    ```
 
 4. Start the development server:
@@ -55,6 +61,15 @@ Vision is a modern web application that leverages Stability AI (DreamStudio) to 
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
+## Authentication Setup
+
+The application uses Supabase for authentication. Make sure your Supabase project has email authentication enabled.
+
+1. Go to your Supabase project dashboard
+2. Navigate to Authentication > Providers
+3. Enable Email provider
+4. Configure any additional authentication providers if needed
+
 ## Deployment on Vercel
 
 ### Setting Up Environment Variables on Vercel
@@ -63,16 +78,15 @@ When deploying to Vercel, you need to configure your environment variables in th
 
 1. Create a new project on Vercel and import your repository
 2. In the project settings, go to the "Environment Variables" section
-3. Add the following environment variable:
-   - Key: `STABILITY_API_KEY`
-   - Value: Your Stability AI API key from DreamStudio
+3. Add the following environment variables:
+   - `STABILITY_API_KEY`: Your Stability AI API key from DreamStudio
+   - `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase anonymous key
 4. Deploy your application
-
-![Vercel Environment Variables](vercel-env-vars.png)
 
 ### Vercel One-Click Deployment
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FHardikGera%2FImage-Generation-Vision-&env=STABILITY_API_KEY&envDescription=API%20key%20for%20Stability%20AI%20required%20to%20generate%20images&envLink=https%3A%2F%2Fbeta.dreamstudio.ai%2Fmembership%3Ftab%3DapiKeys)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fyourusername%2Fvision-ai-image-generator&env=STABILITY_API_KEY,NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY&envDescription=API%20keys%20required%20for%20the%20application)
 
 ## Troubleshooting
 
@@ -87,17 +101,18 @@ When deploying to Vercel, you need to configure your environment variables in th
 - Verify your API key is correct and not expired
 - Check the browser console for more detailed error messages
 
+**"Authentication failed"**
+- Make sure your Supabase URL and anon key are correct
+- Check the Supabase dashboard for any authentication errors
+
 ## Credit Usage
 
 Each image generation costs 1 credit in the Stability AI API. The application is designed to generate one image at a time to help conserve your free credits.
 
-## Screenshots
-
-(Add screenshots here once available)
-
 ## Documentation
 
-For more information about the Stability AI image generation, see the [docs/stability-image-generation.md](docs/stability-image-generation.md) file.
+- For more information about the Stability AI image generation, see the [docs/stability-image-generation.md](docs/stability-image-generation.md) file.
+- For more information about the Gemini API (optional), see the [docs/gemini-image-generation.md](docs/gemini-image-generation.md) file.
 
 ## Contributing
 
@@ -110,6 +125,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Acknowledgments
 
 - Stability AI for providing the image generation capabilities
+- Supabase for authentication and database services
 - Next.js team for the amazing framework
 - Tailwind CSS for the styling utilities
 - Framer Motion for the animations

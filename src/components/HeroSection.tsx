@@ -113,9 +113,16 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden py-20">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-radial from-purple-500/10 via-transparent to-transparent" />
+    <section className="relative min-h-screen flex flex-col items-center justify-center py-28 overflow-hidden">
+      {/* Animated background */}
+      <div className="absolute inset-0 bg-[#111111]">
+        <div className="absolute inset-0 bg-gradient-to-b from-violet-600/10 to-transparent"></div>
+        <div className="absolute top-0 left-0 w-full h-full">
+          <div className="absolute top-1/3 left-1/4 w-72 h-72 bg-purple-600/20 rounded-full filter blur-3xl animate-blob"></div>
+          <div className="absolute top-1/2 right-1/4 w-72 h-72 bg-blue-600/20 rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
+          <div className="absolute bottom-1/4 left-1/3 w-72 h-72 bg-pink-600/20 rounded-full filter blur-3xl animate-blob animation-delay-4000"></div>
+        </div>
+      </div>
       
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <motion.div
@@ -145,9 +152,9 @@ export default function HeroSection() {
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
             <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
-              <div className="relative flex items-center bg-black rounded-lg">
-                <Sparkles className="w-6 h-6 text-purple-500 ml-4" />
+              <div className="absolute -inset-1 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+              <div className="relative flex items-center bg-black rounded-lg overflow-hidden">
+                <Sparkles className="w-6 h-6 text-purple-500 ml-4 animate-pulse" />
                 <input
                   type="text"
                   value={prompt}
@@ -160,7 +167,7 @@ export default function HeroSection() {
                   disabled={loading}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className={`px-6 py-2 mr-2 ${loading ? 'bg-gray-600' : 'bg-blue-500 hover:bg-blue-600'} text-white rounded-lg transition-colors`}
+                  className={`px-6 py-2 mr-2 ${loading ? 'bg-gray-600' : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg hover:shadow-purple-500/20'} text-white rounded-lg transition-all duration-300`}
                 >
                   {loading ? 'Generating...' : 'Generate'}
                 </motion.button>
@@ -185,14 +192,12 @@ export default function HeroSection() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="flex justify-center space-x-4 text-sm text-gray-400"
+            className="flex flex-wrap justify-center gap-3 text-sm text-gray-400"
           >
-            <span>✨ Ultra HD Quality</span>
-            <span>•</span>
-            <span>🎨 Multiple Styles</span>
-            <span>•</span>
-            <span>⚡ Lightning Fast</span>
-            <span onClick={toggleDebugMode} className="cursor-pointer ml-4 text-xs opacity-50 hover:opacity-100">
+            <span className="px-3 py-1 rounded-full bg-purple-900/30 border border-purple-800/50">✨ Ultra HD Quality</span>
+            <span className="px-3 py-1 rounded-full bg-blue-900/30 border border-blue-800/50">🎨 Multiple Styles</span>
+            <span className="px-3 py-1 rounded-full bg-indigo-900/30 border border-indigo-800/50">⚡ Lightning Fast</span>
+            <span onClick={toggleDebugMode} className="cursor-pointer text-xs opacity-50 hover:opacity-100">
               •Debug: {debugMode ? 'ON' : 'OFF'}
             </span>
           </motion.div>
@@ -209,7 +214,7 @@ export default function HeroSection() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="relative aspect-square overflow-hidden rounded-lg border border-purple-500/30 shadow-xl shadow-purple-500/10 mx-auto"
+                className="relative group aspect-square overflow-hidden rounded-lg border border-purple-500/30 shadow-xl shadow-purple-500/10 mx-auto hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300"
                 style={{ maxWidth: '512px' }}
               >
                 {/* Data info for debugging */}
@@ -234,7 +239,7 @@ export default function HeroSection() {
                 <img
                   src={`data:${image.mimeType};base64,${image.url}`}
                   alt={`Generated image ${index + 1}`}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   onError={(e) => {
                     console.error(`Error loading image ${index}:`, e);
                     const target = e.currentTarget as HTMLImageElement;
@@ -251,42 +256,32 @@ export default function HeroSection() {
                   }}
                 />
                 
-                {/* Add download and copy buttons container */}
-                <div className="absolute bottom-0 left-0 right-0 p-3 bg-black/70 flex justify-center space-x-4">
-                  <button
+                {/* Action buttons (download, copy) */}
+                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex justify-center space-x-2">
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                     onClick={() => handleDownload(image.url, image.mimeType)}
-                    className="bg-white text-black rounded-md px-4 py-2 text-sm font-medium flex items-center hover:bg-gray-200 transition-colors shadow-md"
-                    style={{ minWidth: '120px', justifyContent: 'center' }}
+                    className="p-2 bg-blue-600 rounded-full text-white hover:bg-blue-500"
+                    title="Download image"
                   >
-                    <Download className="w-4 h-4 mr-2" />
-                    Download
-                  </button>
+                    <Download className="h-5 w-5" />
+                  </motion.button>
                   
-                  <button
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                     onClick={() => handleCopy(image.url, image.mimeType, index)}
-                    className="bg-white text-black rounded-md px-4 py-2 text-sm font-medium flex items-center hover:bg-gray-200 transition-colors shadow-md"
-                    style={{ minWidth: '120px', justifyContent: 'center' }}
+                    className="p-2 bg-purple-600 rounded-full text-white hover:bg-purple-500"
+                    title="Copy to clipboard"
                   >
-                    {copySuccess && lastCopiedIndex === index ? (
-                      <>
-                        <Check className="w-4 h-4 mr-2 text-green-600" />
-                        Copied!
-                      </>
+                    {lastCopiedIndex === index && copySuccess ? (
+                      <Check className="h-5 w-5" />
                     ) : (
-                      <>
-                        <Copy className="w-4 h-4 mr-2" />
-                        Copy
-                      </>
+                      <Copy className="h-5 w-5" />
                     )}
-                  </button>
+                  </motion.button>
                 </div>
-                
-                {/* Show data length for debugging purposes */}
-                {image.url && debugMode && (
-                  <div className="absolute bottom-16 left-0 right-0 bg-black/70 text-white text-xs p-1 text-center">
-                    Received data: {image.url.length} characters
-                  </div>
-                )}
               </motion.div>
             ))}
           </div>

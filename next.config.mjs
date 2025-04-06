@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Disable tracing to prevent permission errors
+  output: 'standalone', // This automatically disables tracing
+  experimental: {
+    // Empty experimental section to avoid warnings
+  },
   images: {
     remotePatterns: [
       {

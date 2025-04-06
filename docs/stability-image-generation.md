@@ -22,11 +22,12 @@ The API route is implemented in `src/app/api/stability/generate-image/route.ts`:
 
 ```typescript
 import { NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabase/client';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { prompt } = body;
+    const { prompt, userId } = body;
     
     if (!prompt) {
       return NextResponse.json(
@@ -64,22 +65,78 @@ export async function POST(request: Request) {
         }),
       });
 
-      // Process response and return image
-      // ...
-    } catch (modelError) {
-      // Error handling
-      // ...
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to generate image');
+      }
+
+      const responseData = await response.json();
+      const generatedImage = responseData.artifacts[0];
+      
+      // If userId is provided, save the image reference to the user's profile
+      if (userId) {
+        // Save image data to Supabase
+        const { data, error } = await supabase
+          .from('user_images')
+          .insert({
+            user_id: userId,
+            prompt: prompt,
+            image_data: `data:image/png;base64,${generatedImage.base64}`,
+            created_at: new Date()
+          });
+          
+        if (error) {
+          console.error('Error saving image to user profile:', error);
+        }
+      }
+
+      return NextResponse.json({
+        image: `data:image/png;base64,${generatedImage.base64}`
+      });
+    } catch (modelError: any) {
+      console.error('Model error:', modelError);
+      return NextResponse.json(
+        { error: modelError.message || 'Failed to generate image' },
+        { status: 500 }
+      );
     }
-  } catch (error) {
-    // Error handling
-    // ...
+  } catch (error: any) {
+    console.error('Server error:', error);
+    return NextResponse.json(
+      { error: error.message || 'An unexpected error occurred' },
+      { status: 500 }
+    );
   }
 }
 ```
 
 ### Client Component
 
-The client component for image generation is implemented in `src/components/HeroSection.tsx`.
+The client component for image generation is implemented in `src/components/ImageGenerator.tsx`.
+
+## User Images Storage
+
+When a user is authenticated, generated images can be saved to their profile in Supabase. This requires:
+
+1. A `user_images` table in your Supabase database with the following schema:
+   - `id`: UUID (primary key)
+   - `user_id`: UUID (references auth.users.id)
+   - `prompt`: Text
+   - `image_data`: Text (Base64 encoded image data)
+   - `created_at`: Timestamp
+
+2. RLS (Row Level Security) policies to ensure users can only access their own images:
+   ```sql
+   CREATE POLICY "Users can view their own images" 
+   ON user_images 
+   FOR SELECT 
+   USING (auth.uid() = user_id);
+   
+   CREATE POLICY "Users can insert their own images" 
+   ON user_images 
+   FOR INSERT 
+   WITH CHECK (auth.uid() = user_id);
+   ```
 
 ## Stability AI Image Generation Options
 
