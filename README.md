@@ -6,7 +6,7 @@ Vision is a modern web application that leverages Stability AI (DreamStudio) to 
 
 ## Live Demo
 
-Experience Vision in action: [https://vision-ai-generator.vercel.app](https://vision-ai-generator.vercel.app)
+Experience Vision in action: [https://image-generation-vision.vercel.app/](https://image-generation-vision.vercel.app/)
 
 ## Features
 

@@ -4,7 +4,7 @@ This documentation provides detailed information about deploying the Vision AI I
 
 ## Live Demo
 
-Experience Vision in action: [https://vision-ai-generator.vercel.app](https://vision-ai-generator.vercel.app)
+Experience Vision in action: [https://image-generation-vision.vercel.app/](https://image-generation-vision.vercel.app/)
 
 ## Vercel Deployment
 
