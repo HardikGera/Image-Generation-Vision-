@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/lib/hooks/useAuth';
+import ProfileDropdown from './ProfileDropdown';
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -57,17 +58,7 @@ export default function Navbar() {
           <div className="hidden sm:ml-6 sm:flex sm:items-center">
             <div className="flex space-x-4">
               {user ? (
-                <>
-                  <Link href="/profile" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                    Profile
-                  </Link>
-                  <button
-                    onClick={handleSignOut}
-                    className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-                  >
-                    Sign out
-                  </button>
-                </>
+                <ProfileDropdown />
               ) : (
                 <>
                   <Link href="/login" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">

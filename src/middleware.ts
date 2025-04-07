@@ -1,23 +1,46 @@
 import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
-import { NextResponse, type NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export async function middleware(request: NextRequest) {
+export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
-  const supabase = createMiddlewareClient({ req: request, res });
+  const supabase = createMiddlewareClient({ req, res });
   
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  // If no session and the user is trying to access a protected route, redirect to login
-  if (!session && request.nextUrl.pathname.startsWith('/profile')) {
-    const redirectUrl = new URL('/login', request.url);
-    return NextResponse.redirect(redirectUrl);
+  // Refresh session if expired
+  const { data: { session } } = await supabase.auth.getSession();
+  
+  // Get the pathname from the URL
+  const path = req.nextUrl.pathname;
+  
+  // Define auth pages and protected pages
+  const isAuthPage = path === '/login' || path === '/signup';
+  const isProtectedPage = path === '/dashboard' || path === '/profile' || path.startsWith('/admin');
+  
+  // Redirect logic
+  if (isAuthPage && session) {
+    // Redirect authenticated users away from auth pages
+    return NextResponse.redirect(new URL('/', req.url));
   }
-
+  
+  if (isProtectedPage && !session) {
+    // Redirect unauthenticated users away from protected pages
+    return NextResponse.redirect(new URL('/login', req.url));
+  }
+  
   return res;
 }
 
+// This middleware will run for all routes
 export const config = {
-  matcher: ['/profile/:path*'],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public (public files)
+     * - api (API routes)
+     */
+    '/((?!_next/static|_next/image|favicon.ico|public|api).*)',
+  ],
 }; 
