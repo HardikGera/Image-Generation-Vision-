@@ -4,6 +4,10 @@ Vision is a modern web application that leverages Stability AI (DreamStudio) to 
 
 ![Vision AI Image Generator](screenshot.png)
 
+## Live Demo
+
+Experience Vision in action: [https://vision-ai-generator.vercel.app](https://vision-ai-generator.vercel.app)
+
 ## Features
 
 - **AI-Powered Image Generation**: Generate high-quality images from text descriptions using Stability AI's SDXL model
@@ -34,8 +38,8 @@ Vision is a modern web application that leverages Stability AI (DreamStudio) to 
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/vision-ai-image-generator.git
-   cd vision-ai-image-generator
+   git clone https://github.com/HardikGera/Image-Generation-Vision-.git
+   cd Image-Generation-Vision-
    ```
 
 2. Install dependencies:
@@ -86,7 +90,7 @@ When deploying to Vercel, you need to configure your environment variables in th
 
 ### Vercel One-Click Deployment
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fyourusername%2Fvision-ai-image-generator&env=STABILITY_API_KEY,NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY&envDescription=API%20keys%20required%20for%20the%20application)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FHardikGera%2FImage-Generation-Vision-&env=STABILITY_API_KEY,NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY&envDescription=API%20keys%20required%20for%20the%20application)
 
 ## Troubleshooting
 
@@ -111,8 +115,11 @@ Each image generation costs 1 credit in the Stability AI API. The application is
 
 ## Documentation
 
-- For more information about the Stability AI image generation, see the [docs/stability-image-generation.md](docs/stability-image-generation.md) file.
-- For more information about the Gemini API (optional), see the [docs/gemini-image-generation.md](docs/gemini-image-generation.md) file.
+- [Deployment Guide](docs/deployment-guide.md) - Detailed instructions for deploying the application to Vercel
+- [Stability AI Image Generation](docs/stability-image-generation.md) - Information about the Stability AI integration
+- [Supabase Authentication](docs/supabase-authentication.md) - Details about the authentication system
+- [Project Structure](docs/project-structure.md) - Overview of the codebase structure
+- [Gemini API (Optional)](docs/gemini-image-generation.md) - Information about optional Gemini API integration
 
 ## Contributing
 
